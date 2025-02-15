@@ -1,0 +1,38 @@
+{
+  "name": "advanced-env-manager",
+  "version": "1.0.0",
+  "description": "Advanced environment variable manager",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest",
+    "start": "node src/index.js",
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emorilebo/advanced-env-manager.git"
+  },
+  "keywords": [
+    "GodfreyLebo",
+    "Emori",
+    ".env",
+    "security",
+    "variables"
+  ],
+  "author": "Godfrey Lebo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/emorilebo/advanced-env-manager/issues"
+  },
+  "homepage": "https://github.com/emorilebo/advanced-env-manager#readme",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "crypto-js": "^4.1.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "eslint": "^8.45.0",
+    "prettier": "^3.0.0"
+  }
+}
