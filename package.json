@@ -1,7 +1,7 @@
 {
   "name": "advanced-env-manager",
-  "version": "1.0.0",
-  "description": "Advanced environment variable manager",
+  "version": "1.0.1",
+  "description": "Advanced secure environment variable manager for local and server development",
   "main": "src/index.js",
   "scripts": {
     "test": "jest",
