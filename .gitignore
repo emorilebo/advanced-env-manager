@@ -23,3 +23,5 @@ npm-debug.log*
 # OS specific files
 .DS_Store
 Thumbs.db 
+
+.npmrc
