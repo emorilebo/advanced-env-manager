@@ -1,16 +1,21 @@
 module.exports = {
-  env: {
-    node: true,
-    es2021: true,
-    jest: true,
-  },
-  extends: ['eslint:recommended'],
+  parser: '@typescript-eslint/parser',
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended'
+  ],
   parserOptions: {
-    ecmaVersion: 12,
+    ecmaVersion: 2018,
     sourceType: 'module',
   },
+  env: {
+    node: true,
+    es2018: true,
+    jest: true,
+  },
   rules: {
-    'no-unused-vars': 'warn',
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': ['warn'],
     'no-console': 'off',
   },
 }; 
