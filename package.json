@@ -1,6 +1,6 @@
 {
   "name": "advanced-env-manager",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Advanced secure environment variable manager for local and server development",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
