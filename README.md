@@ -74,6 +74,9 @@ start();
 - `AWS_REGION`: AWS region for Secrets Manager
 - `AWS_SECRET_NAME`: Name of the secret in AWS Secrets Manager
 
+## Contributors
+- Rikwu Godwin Onyung
+
 ## License
 
 ISC
