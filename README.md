@@ -77,3 +77,5 @@ start();
 ## License
 
 ISC
+## Contributors
+- myckelspark (@myckelSpark)
