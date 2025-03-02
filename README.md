@@ -77,6 +77,7 @@ start();
 ## Contributors
 - Rikwu Godwin Onyung
 - Ghedinaeval Charles Don-Ibor
+- Michael Fredrick Ikaka
 
 ## License
 
