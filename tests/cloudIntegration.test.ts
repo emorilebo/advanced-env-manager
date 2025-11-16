@@ -1,58 +1,86 @@
-import AWS from 'aws-sdk';
-import { fetchCloudSecrets } from '../src/cloudIntegration';
+import {
+  SecretsManagerClient as MockSecretsManagerClient,
+  GetSecretValueCommand,
+} from '@aws-sdk/client-secrets-manager';
+import { fetchCloudSecrets, initAWS } from '../src/cloudIntegration';
 
-// Mock AWS SDK
-jest.mock('aws-sdk', () => {
-  const mockGetSecretValue = jest.fn();
+// Mock AWS SDK v3
+const mockSend = jest.fn();
+
+jest.mock('@aws-sdk/client-secrets-manager', () => {
   return {
-    config: {
-      update: jest.fn()
-    },
-    SecretsManager: jest.fn(() => ({
-      getSecretValue: mockGetSecretValue
-    }))
+    SecretsManagerClient: jest.fn().mockImplementation(() => ({
+      send: mockSend,
+    })),
+    GetSecretValueCommand: jest.fn().mockImplementation((input) => input),
   };
 });
 
 describe('Cloud Integration', () => {
-  let mockSecretsManager: jest.Mocked<AWS.SecretsManager>;
-  
   beforeEach(() => {
     jest.clearAllMocks();
     process.env.NODE_ENV = 'test';
-    mockSecretsManager = new AWS.SecretsManager() as jest.Mocked<AWS.SecretsManager>;
+    process.env.AWS_REGION = 'us-east-1';
+    process.env.AWS_SECRET_NAME = 'test-secret';
   });
 
   afterEach(() => {
     delete process.env.NODE_ENV;
+    delete process.env.AWS_REGION;
+    delete process.env.AWS_SECRET_NAME;
+  });
+
+  test('should initialize AWS client with correct region', () => {
+    initAWS('us-west-2');
+    expect(MockSecretsManagerClient).toHaveBeenCalledWith({
+      region: 'us-west-2',
+    });
+  });
+
+  test('should initialize AWS client with default region', () => {
+    initAWS();
+    expect(MockSecretsManagerClient).toHaveBeenCalledWith({
+      region: 'us-east-1',
+    });
   });
 
   test('should fetch secrets from AWS Secrets Manager', async () => {
     // Setup mock response
-    mockSecretsManager.getSecretValue.mockReturnValue({
-      promise: () => Promise.resolve({
-        SecretString: JSON.stringify({
-          TEST_SECRET: 'test-value'
-        })
-      })
-    } as any);
+    mockSend.mockResolvedValue({
+      SecretString: JSON.stringify({
+        TEST_SECRET: 'test-value',
+      }),
+    });
 
     const secrets = await fetchCloudSecrets();
-    
-    // Verify AWS config was updated
-    expect(AWS.config.update).toHaveBeenCalledWith({
-      region: 'us-east-1'
+
+    // Verify GetSecretValueCommand was created with correct input
+    expect(GetSecretValueCommand).toHaveBeenCalledWith({
+      SecretId: 'test-secret',
     });
 
     // Verify secrets were fetched
     expect(secrets).toHaveProperty('TEST_SECRET', 'test-value');
   });
 
-  test('should handle AWS errors gracefully', async () => {
+  test('should use default secret name when not provided', async () => {
+    delete process.env.AWS_SECRET_NAME;
+    mockSend.mockResolvedValue({
+      SecretString: JSON.stringify({
+        TEST_SECRET: 'test-value',
+      }),
+    });
+
+    await fetchCloudSecrets();
+
+    expect(GetSecretValueCommand).toHaveBeenCalledWith({
+      SecretId: 'default',
+    });
+  });
+
+  test('should handle AWS errors gracefully in test environment', async () => {
     // Setup mock error
-    mockSecretsManager.getSecretValue.mockReturnValue({
-      promise: () => Promise.reject(new Error('AWS Error'))
-    } as any);
+    mockSend.mockRejectedValue(new Error('AWS Error'));
 
     // Verify error is thrown in test environment
     await expect(fetchCloudSecrets()).rejects.toThrow('AWS Error');
@@ -60,10 +88,28 @@ describe('Cloud Integration', () => {
 
   test('should handle missing SecretString', async () => {
     // Setup mock response without SecretString
-    mockSecretsManager.getSecretValue.mockReturnValue({
-      promise: () => Promise.resolve({})
-    } as any);
+    mockSend.mockResolvedValue({});
 
-    await expect(fetchCloudSecrets()).rejects.toThrow('No secret string found');
+    await expect(fetchCloudSecrets()).rejects.toThrow(
+      'No secret string found for secret'
+    );
   });
-}); 
+
+  test('should accept custom secret name and region', async () => {
+    mockSend.mockResolvedValue({
+      SecretString: JSON.stringify({
+        CUSTOM_SECRET: 'custom-value',
+      }),
+    });
+
+    const secrets = await fetchCloudSecrets('custom-secret', 'eu-west-1');
+
+    expect(GetSecretValueCommand).toHaveBeenCalledWith({
+      SecretId: 'custom-secret',
+    });
+    expect(MockSecretsManagerClient).toHaveBeenCalledWith({
+      region: 'eu-west-1',
+    });
+    expect(secrets).toHaveProperty('CUSTOM_SECRET', 'custom-value');
+  });
+});

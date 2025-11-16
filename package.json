@@ -1,16 +1,30 @@
 {
   "name": "advanced-env-manager",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Advanced secure environment variable manager for local and server development",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "build": "tsc",
     "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "start": "node dist/index.js",
     "lint": "eslint . --ext .ts",
-    "format": "prettier --write .",
-    "prepare": "npm run build"
+    "lint:fix": "eslint . --ext .ts --fix",
+    "format": "prettier --write \"**/*.{ts,js,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,js,json,md}\"",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run build && npm test"
   },
   "repository": {
     "type": "git",
@@ -32,12 +46,11 @@
   },
   "homepage": "https://github.com/emorilebo/advanced-env-manager#readme",
   "dependencies": {
-    "aws-sdk": "^2.1193.0",
+    "@aws-sdk/client-secrets-manager": "^3.490.0",
     "dotenv": "^16.3.1",
     "joi": "^17.6.4"
   },
   "devDependencies": {
-    "@types/aws-sdk": "^0.0.42",
     "@types/jest": "^29.5.0",
     "@types/node": "^18.0.0",
     "@typescript-eslint/eslint-plugin": "^5.0.0",

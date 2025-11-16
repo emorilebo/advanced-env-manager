@@ -10,4 +10,4 @@ describe('Loader', () => {
   afterEach(() => {
     delete process.env.TEST_VAR;
   });
-}); 
+});

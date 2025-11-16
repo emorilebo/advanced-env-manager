@@ -5,11 +5,11 @@ jest.mock('aws-sdk', () => {
   const mockGetSecretValue = jest.fn();
   return {
     config: {
-      update: jest.fn()
+      update: jest.fn(),
     },
     SecretsManager: jest.fn(() => ({
-      getSecretValue: mockGetSecretValue
-    }))
+      getSecretValue: mockGetSecretValue,
+    })),
   };
 });
 
@@ -17,7 +17,7 @@ const { fetchCloudSecrets } = require('../src/cloudIntegration');
 
 describe('Cloud Integration', () => {
   let mockSecretsManager;
-  
+
   beforeEach(() => {
     jest.clearAllMocks();
     process.env.NODE_ENV = 'test';
@@ -31,18 +31,19 @@ describe('Cloud Integration', () => {
   test('should fetch secrets from AWS Secrets Manager', async () => {
     // Setup mock response
     mockSecretsManager.getSecretValue.mockReturnValue({
-      promise: () => Promise.resolve({
-        SecretString: JSON.stringify({
-          TEST_SECRET: 'test-value'
-        })
-      })
+      promise: () =>
+        Promise.resolve({
+          SecretString: JSON.stringify({
+            TEST_SECRET: 'test-value',
+          }),
+        }),
     });
 
     const secrets = await fetchCloudSecrets();
-    
+
     // Verify AWS config was updated
     expect(AWS.config.update).toHaveBeenCalledWith({
-      region: 'us-east-1'
+      region: 'us-east-1',
     });
 
     // Verify secrets were fetched
@@ -52,7 +53,7 @@ describe('Cloud Integration', () => {
   test('should handle AWS errors gracefully', async () => {
     // Setup mock error
     mockSecretsManager.getSecretValue.mockReturnValue({
-      promise: () => Promise.reject(new Error('AWS Error'))
+      promise: () => Promise.reject(new Error('AWS Error')),
     });
 
     // Verify error is thrown in test environment
@@ -62,7 +63,7 @@ describe('Cloud Integration', () => {
   test('should handle missing SecretString', async () => {
     // Setup mock response without SecretString
     mockSecretsManager.getSecretValue.mockReturnValue({
-      promise: () => Promise.resolve({})
+      promise: () => Promise.resolve({}),
     });
 
     await expect(fetchCloudSecrets()).rejects.toThrow('No secret string found');

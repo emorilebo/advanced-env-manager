@@ -7,7 +7,7 @@ describe('Validator', () => {
     const validEnv: EnvConfig = {
       NODE_ENV: 'development',
       PORT: '3000',
-      DATABASE_URL: 'https://db.com'
+      DATABASE_URL: 'https://db.com',
     };
     expect(() => validateEnv(validEnv, envSchema)).not.toThrow();
   });
@@ -15,8 +15,8 @@ describe('Validator', () => {
   test('throws error for invalid variables', () => {
     const invalidEnv: EnvConfig = {
       NODE_ENV: 'invalid',
-      DATABASE_URL: 'invalid-url'
+      DATABASE_URL: 'invalid-url',
     };
     expect(() => validateEnv(invalidEnv, envSchema)).toThrow();
   });
-}); 
+});

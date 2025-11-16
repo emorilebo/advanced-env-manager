@@ -8,14 +8,14 @@ jest.mock('../src/cloudIntegration');
 describe('EnvManager', () => {
   let envManager;
   const testSchema = require('joi').object({
-    TEST_VAR: require('joi').string().required()
+    TEST_VAR: require('joi').string().required(),
   });
 
   beforeEach(() => {
     process.env.TEST_VAR = 'test-value';
     envManager = new EnvManager({
       envPath: '.env.test',
-      schema: testSchema
+      schema: testSchema,
     });
   });
 
@@ -39,4 +39,4 @@ describe('EnvManager', () => {
     delete process.env.TEST_VAR;
     await expect(envManager.initialize()).rejects.toThrow();
   });
-}); 
+});
